@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ProjectShedulerDemo.Models;
+using ProjectShedulerDemo.Utilities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -15,6 +17,8 @@ namespace ProjectShedulerDemo
         public MainForm()
         {
             InitializeComponent();
+            Project project = ProjectUtilities.CreateProject(6, 2);
+            console.AppendText(project.ToString());
         }
     }
 }

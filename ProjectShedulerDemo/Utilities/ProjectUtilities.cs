@@ -9,7 +9,6 @@ namespace ProjectShedulerDemo.Utilities
 {
     class ProjectUtilities
     {
-        // (Replace this with code that creates a "real" project. This project is randomly generated.)
         public static Project CreateProject(int taskCount, int resourceCount)
         {
             System.Random random = new Random(0);
@@ -37,6 +36,87 @@ namespace ProjectShedulerDemo.Utilities
             }
 
             return new Project(tasks, resources, links);
+        }
+
+        public static void PrintProjectSchedule(Project project, IDictionary<int, double> schedule)
+        {
+            Console.WriteLine();
+            Console.WriteLine("SCHEDULE:");
+            foreach (var taskSchedule in schedule)
+            {
+                Models.Task task = project.Tasks[taskSchedule.Key];
+                double start = Math.Round(taskSchedule.Value, 3);
+                Console.WriteLine("{0}: [{1} - {2}]", task.ID, start, start + task.Duration);
+            }
+        }
+
+        private static DateTime AddDays(DateTime start, double days, bool isStart)
+        {
+            while (days > 0)
+            {
+                if (days > 1)
+                {
+                    start = start.AddDays(1);
+                    start = NextWorkingTime(start, false);
+                    days -= 1.0;
+                }
+                else {
+                    start = start.AddHours(9 * days);
+                    if (start.TimeOfDay >= TimeSpan.FromHours(isStart ? 17 : 17.01))
+                    {
+                        TimeSpan duration = start.TimeOfDay - TimeSpan.FromHours(17);
+                        start = NextWorkingTime(start, isStart).Add(duration);
+                    }
+                    days = 0;
+                }
+            }
+            start = NextWorkingTime(start, isStart);
+            return start;
+        }
+
+        private static DateTime NextWorkingTime(DateTime start, bool isStart)
+        {
+            if (start.TimeOfDay >= TimeSpan.FromHours(isStart ? 17 : 17.01))
+            {
+                start = start.Date.AddHours(24 + 8);
+            }
+            else if (start.Hour < 8)
+            {
+                start = start.Date.AddHours(8);
+            }
+
+            while (start.DayOfWeek == DayOfWeek.Saturday || start.DayOfWeek == DayOfWeek.Sunday)
+            {
+                start = start.AddDays(1);
+            }
+            return start;
+        }
+
+        public static string ToCsv(Project project, IDictionary<int, double> schedule)
+        {
+            DateTime projectStart = DateTime.Now;
+            StringBuilder build = new StringBuilder(40 + project.Tasks.Count * 30);
+            build.AppendLine("ID,Name,Duration,Start_Date,Finish_Date,Predecessors,Resource_Names");
+            Dictionary<string, int[]> depMap = project.Dependencies
+              .GroupBy(d => d.Destination.Name)
+              .ToDictionary(g => g.Key, g => g.Select(d => d.Source.ID + 1).ToArray()); // need to add 1 for MS Project.
+            foreach (Models.Task task in project.Tasks)
+            {
+                string predNames = "";
+                int[] predIds = null;
+                if (depMap.TryGetValue(task.Name, out predIds))
+                {
+                    predNames = "\"" + string.Join(",", predIds) + "\"";
+                }
+                string resourceNames = "\"" + string.Join(",", task.Assignments.Select(a => a.Resource.Name)) + "\"";
+                double startDay = schedule[task.ID];
+                DateTime start = AddDays(projectStart, startDay, true);
+                DateTime finish = AddDays(start, task.Duration, false);
+                build.AppendFormat("{0},{1},{2}d,{3},{4},{5},{6}", task.ID + 1, task.Name, task.Duration,
+                  start, finish, predNames, resourceNames);
+                build.AppendLine();
+            }
+            return build.ToString();
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using ProjectShedulerDemo.Models;
+using ProjectShedulerDemo.СustomControls.GanttChart.Models;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -118,5 +120,41 @@ namespace ProjectShedulerDemo.Utilities
             }
             return build.ToString();
         }
+
+        public static List<BarInformation> ganttFormat(Project project, IDictionary<int, double> schedule)
+        {
+            List<Color> colors = new List<Color>();
+            colors.Add(Color.Red);
+            colors.Add(Color.Green);
+            colors.Add(Color.Blue);
+            colors.Add(Color.Yellow);
+            colors.Add(Color.Silver);
+            colors.Add(Color.Plum);
+
+            DateTime projectStart = DateTime.Now;
+            Dictionary<string, int[]> depMap = project.Dependencies
+              .GroupBy(d => d.Destination.Name)
+              .ToDictionary(g => g.Key, g => g.Select(d => d.Source.ID + 1).ToArray());
+
+            List<BarInformation> ganttData = new List<BarInformation>();
+            foreach (Models.Task task in project.Tasks)
+            {
+                double startDay = schedule[task.ID];
+                DateTime start = AddDays(projectStart, startDay, true);
+                DateTime finish = AddDays(start, task.Duration, false);
+                var resourceId =  task.Assignments.Select(a => a.Resource.ID).FirstOrDefault();
+                ganttData.Add(new BarInformation(task.Name, start, finish, colors[resourceId], Color.Khaki, task.ID));
+            }
+            return ganttData;
+        }
+
+        public void Logger(String lines)
+        {
+            System.IO.StreamWriter file = new System.IO.StreamWriter("D:\\log.txt", true);
+            file.WriteLine(lines);
+            file.Close();
+
+        }
+
     }
 }

@@ -69,6 +69,15 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\ProjectUtilities.cs" />
+    <Compile Include="СustomControls\GanttChart\GanttChart.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="СustomControls\GanttChart\GanttChart.Designer.cs">
+      <DependentUpon>GanttChart.cs</DependentUpon>
+    </Compile>
+    <Compile Include="СustomControls\GanttChart\Models\BarInformation.cs" />
+    <Compile Include="СustomControls\GanttChart\Models\ChartBarDate.cs" />
+    <Compile Include="СustomControls\GanttChart\Models\Header.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

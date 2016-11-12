@@ -32,17 +32,22 @@
             this.File = new System.Windows.Forms.ToolStripMenuItem();
             this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.console = new System.Windows.Forms.TextBox();
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.chartsTabs = new System.Windows.Forms.TabControl();
+            this.tabResources = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.gantChartContainer = new System.Windows.Forms.SplitContainer();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
-            this.splitContainer2.SuspendLayout();
+            this.chartsTabs.SuspendLayout();
+            this.tabResources.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gantChartContainer)).BeginInit();
+            this.gantChartContainer.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -82,10 +87,18 @@
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
+            this.splitContainer1.Panel2.Controls.Add(this.chartsTabs);
             this.splitContainer1.Size = new System.Drawing.Size(1039, 537);
             this.splitContainer1.SplitterDistance = 346;
             this.splitContainer1.TabIndex = 1;
+            // 
+            // console
+            // 
+            this.console.Location = new System.Drawing.Point(3, 0);
+            this.console.Multiline = true;
+            this.console.Name = "console";
+            this.console.Size = new System.Drawing.Size(340, 534);
+            this.console.TabIndex = 0;
             // 
             // dataGridView1
             // 
@@ -98,23 +111,60 @@
             this.dataGridView1.Size = new System.Drawing.Size(340, 531);
             this.dataGridView1.TabIndex = 0;
             // 
-            // console
+            // chartsTabs
             // 
-            this.console.Location = new System.Drawing.Point(3, 0);
-            this.console.Multiline = true;
-            this.console.Name = "console";
-            this.console.Size = new System.Drawing.Size(340, 534);
-            this.console.TabIndex = 0;
+            this.chartsTabs.Controls.Add(this.tabResources);
+            this.chartsTabs.Controls.Add(this.tabPage2);
+            this.chartsTabs.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.chartsTabs.Location = new System.Drawing.Point(0, 0);
+            this.chartsTabs.Name = "chartsTabs";
+            this.chartsTabs.SelectedIndex = 0;
+            this.chartsTabs.Size = new System.Drawing.Size(689, 537);
+            this.chartsTabs.TabIndex = 0;
             // 
-            // splitContainer2
+            // tabResources
             // 
-            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer2.Name = "splitContainer2";
-            this.splitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            this.splitContainer2.Size = new System.Drawing.Size(689, 537);
-            this.splitContainer2.SplitterDistance = 28;
-            this.splitContainer2.TabIndex = 0;
+            this.tabResources.AutoScroll = true;
+            this.tabResources.Controls.Add(this.gantChartContainer);
+            this.tabResources.ForeColor = System.Drawing.SystemColors.Window;
+            this.tabResources.Location = new System.Drawing.Point(4, 22);
+            this.tabResources.Name = "tabResources";
+            this.tabResources.Padding = new System.Windows.Forms.Padding(3);
+            this.tabResources.Size = new System.Drawing.Size(681, 511);
+            this.tabResources.TabIndex = 0;
+            this.tabResources.Text = "Resources";
+            this.tabResources.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(681, 511);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "tabPage2";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // gantChartContainer
+            // 
+            this.gantChartContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gantChartContainer.IsSplitterFixed = true;
+            this.gantChartContainer.Location = new System.Drawing.Point(3, 3);
+            this.gantChartContainer.Name = "gantChartContainer";
+            this.gantChartContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // gantChartContainer.Panel1
+            // 
+            this.gantChartContainer.Panel1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.gantChartContainer.Panel1.Padding = new System.Windows.Forms.Padding(10);
+            this.gantChartContainer.Panel1.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            // 
+            // gantChartContainer.Panel2
+            // 
+            this.gantChartContainer.Panel2.BackColor = System.Drawing.Color.White;
+            this.gantChartContainer.Size = new System.Drawing.Size(675, 505);
+            this.gantChartContainer.SplitterDistance = 33;
+            this.gantChartContainer.TabIndex = 0;
             // 
             // MainForm
             // 
@@ -134,8 +184,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
-            this.splitContainer2.ResumeLayout(false);
+            this.chartsTabs.ResumeLayout(false);
+            this.tabResources.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gantChartContainer)).EndInit();
+            this.gantChartContainer.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -149,7 +201,10 @@
         private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.TextBox console;
-        private System.Windows.Forms.SplitContainer splitContainer2;
+        private System.Windows.Forms.TabControl chartsTabs;
+        internal System.Windows.Forms.TabPage tabResources;
+        private System.Windows.Forms.TabPage tabPage2;
+        public System.Windows.Forms.SplitContainer gantChartContainer;
     }
 }
 

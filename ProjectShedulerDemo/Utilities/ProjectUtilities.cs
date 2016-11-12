@@ -40,16 +40,16 @@ namespace ProjectShedulerDemo.Utilities
             return new Project(tasks, resources, links);
         }
 
-        public static void PrintProjectSchedule(Project project, IDictionary<int, double> schedule)
+        public static string PrintProjectSchedule(Project project, IDictionary<int, double> schedule)
         {
-            Console.WriteLine();
-            Console.WriteLine("SCHEDULE:");
+            string report = "\r\n";
             foreach (var taskSchedule in schedule)
             {
                 Models.Task task = project.Tasks[taskSchedule.Key];
                 double start = Math.Round(taskSchedule.Value, 3);
-                Console.WriteLine("{0}: [{1} - {2}]", task.ID, start, start + task.Duration);
+                report += string.Format("t{0}: [{1} - {2} : {3}]\r\n", task.ID, start, start + task.Duration, task.Assignments.FirstOrDefault().Resource.Name);
             }
+            return report;
         }
 
         private static DateTime AddDays(DateTime start, double days, bool isStart)
@@ -72,7 +72,7 @@ namespace ProjectShedulerDemo.Utilities
                     days = 0;
                 }
             }
-            start = NextWorkingTime(start, isStart);
+            //start = NextWorkingTime(start, isStart);
             return start;
         }
 
@@ -124,8 +124,8 @@ namespace ProjectShedulerDemo.Utilities
         public static List<BarInformation> ganttFormat(Project project, IDictionary<int, double> schedule)
         {
             List<Color> colors = new List<Color>();
-            colors.Add(Color.Red);
             colors.Add(Color.Green);
+            colors.Add(Color.Red);
             colors.Add(Color.Blue);
             colors.Add(Color.Yellow);
             colors.Add(Color.Silver);
@@ -142,8 +142,9 @@ namespace ProjectShedulerDemo.Utilities
                 double startDay = schedule[task.ID];
                 DateTime start = AddDays(projectStart, startDay, true);
                 DateTime finish = AddDays(start, task.Duration, false);
-                var resourceId =  task.Assignments.Select(a => a.Resource.ID).FirstOrDefault();
-                ganttData.Add(new BarInformation(task.Name, start, finish, colors[resourceId], Color.Khaki, task.ID));
+                var resourceId = task.Assignments.Select(a => a.Resource.ID).FirstOrDefault();
+                var resourceName = task.Assignments.Select(a => a.Resource.Name).FirstOrDefault();
+                ganttData.Add(new BarInformation(task.Name, resourceName, start, finish, colors[resourceId], Color.Khaki, task.ID));
             }
             return ganttData;
         }

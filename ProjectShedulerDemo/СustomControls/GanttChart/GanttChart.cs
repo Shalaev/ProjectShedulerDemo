@@ -308,6 +308,11 @@ namespace ProjectShedulerDemo.СustomControls.GanttChart
             SetBarStartLeft(rowText);
         }
 
+        public void ClearChartBars()
+        {
+            bars.Clear();
+        }
+
         public void AddChartBar(string rowText, object barValue, DateTime fromTime, DateTime toTime, Color color, Color hoverColor, int rowIndex, bool hideFromMouseMove)
         {
             ChartBarDate bar = new ChartBarDate();

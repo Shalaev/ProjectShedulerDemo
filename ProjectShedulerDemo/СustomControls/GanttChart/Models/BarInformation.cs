@@ -9,56 +9,26 @@ namespace ProjectShedulerDemo.СustomControls.GanttChart.Models
 {
     class BarInformation
     {
-        private string _rowText;
-        private DateTime _fromTime;
-        private DateTime _toTime;
-        private Color _color;
-        private Color _hoverColor;
-        private int _index;
+        public string RowText { get; set; }
 
-        public string RowText
-        {
-            get { return _rowText; }
-            set { _rowText = value; }
-        }
+        public string BarName { get; set; }
 
-        public DateTime FromTime
-        {
-            get { return _fromTime; }
-            set { _fromTime = value; }
-        }
+        public DateTime FromTime { get; set; }
 
-        public DateTime ToTime
-        {
-            get { return _toTime; }
-            set { _toTime = value; }
-        }
+        public DateTime ToTime { get; set; }
 
-        public Color Color
-        {
-            get { return _color; }
-            set { _color = value; }
-        }
+        public Color Color { get; set; }
 
-        public Color HoverColor
-        {
-            get { return _hoverColor; }
-            set { _hoverColor = value; }
-        }
+        public Color HoverColor { get; set; }
 
-        public int Index
-        {
-            get { return _index; }
-            set { _index = value; }
-        }
+        public int Index{ get; set; }
 
-        public BarInformation()
-        {
-        }
+        public BarInformation() {}
 
-        public BarInformation(string rowText, DateTime fromTime, DateTime totime, Color color, Color hoverColor, int index)
+        public BarInformation(string rowText, string barName, DateTime fromTime, DateTime totime, Color color, Color hoverColor, int index)
         {
             RowText = rowText;
+            BarName = barName;
             FromTime = fromTime;
             ToTime = totime;
             Color = color;

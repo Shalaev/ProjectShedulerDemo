@@ -3,6 +3,7 @@ using ProjectShedulerDemo.Optimizer;
 using ProjectShedulerDemo.Utilities;
 using ProjectShedulerDemo.СustomControls.GanttChart;
 using ProjectShedulerDemo.СustomControls.GanttChart.Models;
+using ProjectShedulerDemo.СustomControls.GanttLegend;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,42 +20,60 @@ namespace ProjectShedulerDemo
     public partial class MainForm : Form
     {
         GanttChart tasksGanttChart = null;
+        Project project = null;
+        SchedulingModel schedulingModel = null;
+        IDictionary<int, double> schedule = null;
 
         public MainForm()
         {
+            tasksGanttChart = new GanttChart();
+            schedulingModel = new SchedulingModel(false);
             InitializeComponent();
             InitializeGantChart();
-            Project project = ProjectUtilities.CreateProject(6, 1);
-            console.AppendText(project.ToString());
-            Stopwatch stopwatch = new Stopwatch();
-            SchedulingModel m = new SchedulingModel(false);
+            InitializeProject();
+            SolveShedule();
+            ShowGantChart();
+        }
 
-            stopwatch.Start();
-            m.Initialize(project);
-            console.AppendText("Init time = " + stopwatch.Elapsed + "\r\n");
-            IDictionary<int, double> schedule = m.Solve();
-            console.AppendText("Total time = " + stopwatch.Elapsed + "\r\n");
-
-            ProjectUtilities.PrintProjectSchedule(project, schedule);
-            String result = ProjectUtilities.ToCsv(project, schedule);
-
+        public void ShowGantChart()
+        {
+            tasksGanttChart.ClearChartBars();
             var ganttData = ProjectUtilities.ganttFormat(project, schedule);
+            var gantLegends = ganttData.GroupBy(gd => gd.BarName).Select(gd => gd.First());
+            foreach(var gantLegend in gantLegends)
+            {
+                gantChartContainer.Panel1.Controls.Add(new GanttLegent(gantLegend.Color, gantLegend.BarName) { Dock = DockStyle.Left});
+            }
             foreach (BarInformation bar in ganttData)
             {
                 tasksGanttChart.AddChartBar(bar.RowText, bar, bar.FromTime, bar.ToTime, bar.Color, bar.HoverColor, bar.Index);
             }
-            //File.WriteAllText("D:\\result.csv", result);
-            //console.AppendText(result);
+        }
+
+        private void SolveShedule()
+        {
+            schedulingModel.Initialize(project);
+            schedule = schedulingModel.Solve();
+
+            console.AppendText(ProjectUtilities.PrintProjectSchedule(project, schedule));
+            String result = ProjectUtilities.ToCsv(project, schedule);
+            console.AppendText(result);
+        }
+
+        private void InitializeProject()
+        {
+            project = ProjectUtilities.CreateProject(7, 3);
+
+            console.AppendText(project.ToString());
         }
 
         private void InitializeGantChart()
         {
-            tasksGanttChart = new GanttChart();
             tasksGanttChart.AllowChange = false;
             tasksGanttChart.Dock = DockStyle.Fill;
             tasksGanttChart.FromDate = DateTime.Now;
             tasksGanttChart.ToDate = DateTime.Now.AddDays(30);
-            splitContainer2.Panel2.Controls.Add(tasksGanttChart);
+            gantChartContainer.Panel2.Controls.Add(tasksGanttChart);
 
             tasksGanttChart.MouseMove += new MouseEventHandler(tasksGanttChart.GanttChart_MouseMove);
             tasksGanttChart.MouseMove += new MouseEventHandler(GanttChart1_MouseMove);

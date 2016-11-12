@@ -78,6 +78,12 @@
     <Compile Include="СustomControls\GanttChart\Models\BarInformation.cs" />
     <Compile Include="СustomControls\GanttChart\Models\ChartBarDate.cs" />
     <Compile Include="СustomControls\GanttChart\Models\Header.cs" />
+    <Compile Include="СustomControls\GanttLegend\GanttLegent.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="СustomControls\GanttLegend\GanttLegent.Designer.cs">
+      <DependentUpon>GanttLegent.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -90,6 +96,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="СustomControls\GanttLegend\GanttLegent.resx">
+      <DependentUpon>GanttLegent.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

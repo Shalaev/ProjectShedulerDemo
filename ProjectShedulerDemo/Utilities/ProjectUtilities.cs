@@ -2,13 +2,30 @@
 using ProjectShedulerDemo.СustomControls.GanttChart.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
+
 
 namespace ProjectShedulerDemo.Utilities
 {
+    public static class ISynchronizeInvokeExtensions
+    {
+        public static void InvokeEx<T>(this T @this, Action<T> action) where T : ISynchronizeInvoke
+        {
+            if (@this.InvokeRequired)
+            {
+                @this.Invoke(action, new object[] { @this });
+            }
+            else
+            {
+                action(@this);
+            }
+        }
+    }
     class ProjectUtilities
     {
         public static Project CreateProject(int taskCount, int resourceCount)
@@ -149,12 +166,58 @@ namespace ProjectShedulerDemo.Utilities
             return ganttData;
         }
 
-        public void Logger(String lines)
+        public static void Logger(string lines)
         {
             System.IO.StreamWriter file = new System.IO.StreamWriter("D:\\log.txt", true);
             file.WriteLine(lines);
             file.Close();
 
+        }
+
+        public static void Save(string text, string path)
+        {
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, true))
+            {
+                file.WriteLine(text);
+            }
+        }
+
+        public static string toJson(Project project)
+        {
+            string projectJson = new JavaScriptSerializer().Serialize(project);
+            return projectJson;
+        }
+
+        public static string Load(string path)
+        {
+            using (System.IO.StreamReader sr = new System.IO.StreamReader(path))
+            {
+                return sr.ReadToEnd();
+            }
+        }
+
+        public static Project toProject(string json)
+        {
+            dynamic project = new JavaScriptSerializer().Deserialize<dynamic>(json);
+            List<Resource> resources = new List<Resource>();
+            List<Models.Task> tasks = new List<Models.Task>();
+            List<TaskDependency> links = new List<TaskDependency>();
+            foreach (dynamic item in project["Resources"])
+            {
+                resources.Add(new Resource(item["Name"], item["MaxUnits"]));
+            }
+            foreach(dynamic item in project["Tasks"])
+            {
+                int resourceId = item["Assignments"][0]["Resource"]["ID"];
+                tasks.Add(new Models.Task(item["Name"], item["Duration"], new Assignment[] { new Assignment(resources[resourceId], 1.0) }));
+            }
+            foreach (dynamic item in project["Dependencies"]){
+                int sourceId = item["Source"]["ID"];
+                int destinationId = item["Destination"]["ID"];
+                links.Add(new TaskDependency { Source = tasks[sourceId], Destination = tasks[destinationId] });
+            }
+
+            return new Project(tasks, resources, links);
         }
 
     }

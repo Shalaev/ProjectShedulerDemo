@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -30,9 +31,9 @@ namespace ProjectShedulerDemo
             schedulingModel = new SchedulingModel(false);
             InitializeComponent();
             InitializeGantChart();
-            InitializeProject();
-            SolveShedule();
-            ShowGantChart();
+            //InitializeProject();
+            //SolveShedule();
+            //ShowGantChart();
         }
 
         public void ShowGantChart()
@@ -42,7 +43,8 @@ namespace ProjectShedulerDemo
             var gantLegends = ganttData.GroupBy(gd => gd.BarName).Select(gd => gd.First());
             foreach(var gantLegend in gantLegends)
             {
-                gantChartContainer.Panel1.Controls.Add(new GanttLegent(gantLegend.Color, gantLegend.BarName) { Dock = DockStyle.Left});
+                //gantChartContainer.Panel1.Controls.Add(new GanttLegent(gantLegend.Color, gantLegend.BarName) { Dock = DockStyle.Left});
+                this.InvokeEx(form => form.gantChartContainer.Panel1.Controls.Add(new GanttLegent(gantLegend.Color, gantLegend.BarName) { Dock = DockStyle.Left }));
             }
             foreach (BarInformation bar in ganttData)
             {
@@ -52,18 +54,26 @@ namespace ProjectShedulerDemo
 
         private void SolveShedule()
         {
+            this.InvokeEx(form => form.pictureBoxPreloader.Visible = true);
             schedulingModel.Initialize(project);
             schedule = schedulingModel.Solve();
-
-            console.AppendText(ProjectUtilities.PrintProjectSchedule(project, schedule));
-            String result = ProjectUtilities.ToCsv(project, schedule);
-            console.AppendText(result);
+            string solveLog = ProjectUtilities.PrintProjectSchedule(project, schedule);
+            this.InvokeEx(form => form.console.AppendText(solveLog));
+            string resultLog = ProjectUtilities.ToCsv(project, schedule);
+            this.InvokeEx(form => form.console.AppendText(resultLog));
+            this.InvokeEx(form => form.pictureBoxPreloader.Visible = false);
+            ShowGantChart();
         }
 
         private void InitializeProject()
         {
-            project = ProjectUtilities.CreateProject(7, 3);
+            //project = ProjectUtilities.CreateProject(7, 3);
 
+            //console.AppendText(project.ToString());
+        }
+        private void InitializeRandomProject()
+        {
+            project = ProjectUtilities.CreateProject(7, 3);
             console.AppendText(project.ToString());
         }
 
@@ -103,5 +113,86 @@ namespace ProjectShedulerDemo
             tasksGanttChart.ToolTipText = toolTipText;
 
         }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            saveFileDialog.ShowDialog();
+            if (saveFileDialog.FileName != "")
+            {
+                string jsonstring = ProjectUtilities.toJson(project);
+                ProjectUtilities.Save(jsonstring, saveFileDialog.FileName);
+            }
+        }
+
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string jsonstring = ProjectUtilities.Load(openFileDialog.FileName);
+                project = ProjectUtilities.toProject(jsonstring);
+                console.AppendText(project.ToString());
+                ShowProject();
+            }
+        }
+
+        private void сalculateToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            ThreadStart solveSheduleThreadStart = new ThreadStart(SolveShedule);
+            Thread solveSheduleThread = new Thread(solveSheduleThreadStart);
+            solveSheduleThread.Start();
+            //SolveShedule();
+
+            
+        }
+
+        private void randomProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InitializeRandomProject();
+        }
+
+        private void testToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void OnFrameChanged(object sender, EventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                BeginInvoke((Action)(() => OnFrameChanged(sender, e)));
+                return;
+            }
+            ImageAnimator.UpdateFrames();
+            Invalidate(false);
+        }
+
+        private void ShowProject()
+        {
+            dataGridViewResources.ColumnCount = 2;
+            dataGridViewResources.Columns[0].Name = "Id";
+            dataGridViewResources.Columns[1].Name = "Name";
+            foreach(Resource item in project.Resources)
+            {
+                dataGridViewResources.Rows.Add(new string[] { item.ID.ToString(), item.Name });
+            }
+            dataGridViewTasks.ColumnCount = 4;
+            dataGridViewTasks.Columns[0].Name = "Id";
+            dataGridViewTasks.Columns[1].Name = "Name";
+            dataGridViewTasks.Columns[2].Name = "Duraction";
+            dataGridViewTasks.Columns[3].Name = "ResourceId";
+            foreach (Models.Task item in project.Tasks)
+            {
+                int resourceId = item.Assignments.ToArray<Assignment>()[0].Resource.ID;
+                dataGridViewTasks.Rows.Add(new string[] { item.ID.ToString(), item.Name, item.Duration.ToString(), resourceId.ToString()});
+            }
+            dataGridViewLinks.ColumnCount = 2;
+            dataGridViewLinks.Columns[0].Name = "Source";
+            dataGridViewLinks.Columns[1].Name = "Destination";
+            foreach (TaskDependency item in project.Dependencies)
+            {
+                dataGridViewLinks.Rows.Add(new string[] { item.Source.ID.ToString(), item.Destination.ID.ToString() });
+            }
+        }
+
     }
 }
